@@ -45,11 +45,39 @@ function twitterFunc(){
 	});
 }
 
+
+var spotifyStart = new spotify({
+	id: 'c40df45743c941c8bf1eda221b50feb0',
+	secret: '6fcaad76b1cf47d7be9703ea09d54e38'
+});
+
+function spotifyFunc(title){
+
+	if(title === undefined){
+		title = 'the sign ace of base';
+	};
+	console.log(title);
+
+	spotifyStart.search({ type: 'track', query: title, limit:1 }, function(err, data) {
+		if (err) {
+		    return console.log('Error occurred: ' + err);
+		}
+			console.log("Artist(s): " + data.tracks.items[0].artists[0].name);
+			console.log("Song Name: " + data.tracks.items[0].name);
+			console.log("Preview Link: " + data.tracks.items[0].preview_url);
+			console.log("Album: " + data.tracks.items[0].album.name); 
+	});
+}
+
+
 //sort commands and runs appropriate function
 if(command === "my-tweets"){
 	twitterFunc();
 }
+else if(command === "spotify-this-song"){
+	spotifyFunc(title);
+}
 else{
-	console.log("this is not a twitter function");
+	console.log("this is not a valid function request");
 }
 
