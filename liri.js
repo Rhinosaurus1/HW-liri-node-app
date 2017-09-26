@@ -41,7 +41,7 @@ function twitterFunc(){
 			}		
 		}
 	});
-}
+};
 
 //set-up for spotify API call
 var spotifyStart = new spotify({
@@ -69,7 +69,7 @@ function spotifyFunc(title){
 			console.log("Album: " + data.tracks.items[0].album.name);
 		} 
 	});
-}
+};
 
 //function to run omdb API call
 function omdbFunc(title){
@@ -97,7 +97,7 @@ function omdbFunc(title){
 		    console.log("Actors: " + JSON.parse(data).Actors);
 	  }
 	});
-}
+};
 
 //sort commands and runs appropriate function
 if(command === "my-tweets"){
