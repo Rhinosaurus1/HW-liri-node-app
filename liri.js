@@ -7,13 +7,37 @@ var tweets = require("./keys.js");
 var twitter = require('twitter');
 var spotify = require('node-spotify-api');
 var request = require('request');
+var fs = require('fs');
 
 //set array for user inputs
 var nodeArray = process.argv;
 
 //assign command and title from user inputs
 var command = nodeArray[2];
-var title = nodeArray[3];
+var input = [];
+var possibleCommands = ['my-tweets','spotify-this-song','movie-this','do-what-it-says'];
+
+
+for(k=3; k<nodeArray.length; k++){
+	input.push(nodeArray[k]);
+};
+
+//concatenates if multiple word title is entered
+function titleConcat(input){
+	var temp = ""
+	if(input[0] === undefined){
+		return input[0];
+	}
+	else{
+		for(j=0; j<input.length; j++){
+			temp = temp + " " + input[j].trim();
+		};
+	return temp.trim();
+	}
+};
+
+//assigns title variable
+var title = titleConcat(input);
 
 //set-up for twitter API call
 var client = new twitter({
@@ -22,7 +46,6 @@ var client = new twitter({
   access_token_key: tweets.access_token_key,
   access_token_secret: tweets.access_token_secret
 });
-
 
 //function to run twitter API call 
 function twitterFunc(){
@@ -99,17 +122,64 @@ function omdbFunc(title){
 	});
 };
 
-//sort commands and runs appropriate function
-if(command === "my-tweets"){
-	twitterFunc();
+//function to read from the random text file and then sends data to runTheRightFunction
+function randomRead(){
+
+	fs.readFile("random.txt", "utf8" , function(error, data){
+
+	  if(error){
+	  	return console.log(error);
+	  }	
+	  var dataArr = data.split(",");
+	  runTheRightFunction(dataArr[0],dataArr[1]);
+
+	});
+};
+
+//runs functions depending on command given
+function runTheRightFunction(command,title){
+
+	if(command === "my-tweets"){
+		twitterFunc();
+	}
+	else if(command === "spotify-this-song"){
+		spotifyFunc(title);
+	}
+	else if(command === "movie-this"){
+		omdbFunc(title);
+	}
+};
+
+
+//check to see if command is valid and if so runs either randomRead or right functions
+if((command !== possibleCommands[0]) && (command !== possibleCommands[1]) && (command !== possibleCommands[2]) && (command !== possibleCommands[3])){
+	console.log ("That is not a valid command.  Please try again.");
+	return;
 }
-else if(command === "spotify-this-song"){
-	spotifyFunc(title);
-}
-else if(command === "movie-this"){
-	omdbFunc(title);
+else if (command === "do-what-it-says"){
+	randomRead();
 }
 else{
-	console.log("this is not a valid function request");
-}
+	runTheRightFunction(command,title);
+};
 
+//log commands to log.txt file
+function getLogText(){
+	var temp2 = ""
+	for(p=2; p<nodeArray.length; p++){
+		temp2 = temp2 + " " + nodeArray[p].trim();
+	};
+	return temp2.trim();
+};
+
+var logText = '\r\n' + getLogText();
+
+fs.appendFile("log.txt", logText, function(err){
+
+   if(err){
+  	return console.log(err);
+  }	
+
+  console.log("Content Added!");
+  console.log("--------------------");
+});
